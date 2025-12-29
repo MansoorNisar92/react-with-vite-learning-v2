@@ -21,6 +21,30 @@ console.log('let after:', b)
 `,
   },
   {
+    id: 'sync-vs-async',
+    title: 'Sync vs async',
+    description:
+      'Sync blocks immediately; async schedules work and continues execution.',
+    code: `function syncWork() {
+  console.log('sync: start heavy work')
+  let sum = 0
+  for (let i = 0; i < 500000; i++) sum += i
+  console.log('sync: done', sum)
+}
+
+async function asyncWork() {
+  console.log('async: start')
+  await Promise.resolve()
+  console.log('async: after await (microtask)')
+}
+
+console.log('script: start')
+syncWork()
+asyncWork()
+console.log('script: end')
+`,
+  },
+  {
     id: 'closure',
     title: 'Closure',
     description: 'Inner function keeps access to outer scope.',
