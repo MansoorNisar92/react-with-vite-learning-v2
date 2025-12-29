@@ -1,4 +1,4 @@
-import { Profiler, useMemo, useState } from 'react'
+import { Profiler, useMemo, useRef, useState } from 'react'
 
 function ms(n) {
   return `${n.toFixed(1)}ms`
@@ -10,6 +10,7 @@ function ms(n) {
  */
 export function RenderProfiler({ id, children }) {
   const [last, setLast] = useState(null)
+  const didUpdateFromProfilerRef = useRef(false)
 
   const onRender = useMemo(
     () =>
@@ -20,11 +21,27 @@ export function RenderProfiler({ id, children }) {
         baseDuration,
         startTime,
       ) {
-        setLast({
-          phase,
-          actualDuration,
-          baseDuration,
-          startTime,
+        // Important: calling setState inside the Profiler callback can cause an
+        // infinite loop (Profiler -> setState -> render -> Profiler -> ...).
+        // We guard against the "self update" render we trigger for the overlay.
+        if (didUpdateFromProfilerRef.current) {
+          didUpdateFromProfilerRef.current = false
+          return
+        }
+
+        const next = { phase, actualDuration, baseDuration, startTime }
+
+        // Only update when value meaningfully changes.
+        // (Prevents re-render storms for tiny timing differences.)
+        setLast((prev) => {
+          const sameEnough =
+            prev &&
+            prev.phase === next.phase &&
+            Math.abs(prev.actualDuration - next.actualDuration) < 0.2
+
+          if (sameEnough) return prev
+          didUpdateFromProfilerRef.current = true
+          return next
         })
       },
     [],
