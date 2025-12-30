@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useMemo, useState } from 'react'
-import { Modal } from '../ui/Modal.jsx'
-import { JSPlayground } from '../ui/JSPlayground.jsx'
+import { useTheme } from '../contexts/ThemeContext.jsx'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 function usePageTitle() {
   const { pathname } = useLocation()
@@ -15,14 +15,10 @@ function usePageTitle() {
   }, [pathname])
 }
 
-function toggleTheme() {
-  const current = document.documentElement.dataset.theme || 'dark'
-  document.documentElement.dataset.theme = current === 'dark' ? 'light' : 'dark'
-}
-
 export function DashboardLayout() {
   const title = usePageTitle()
-  const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false)
+  const { toggleTheme } = useTheme()
+  const { session } = useAuth()
 
   return (
     <div className="appShell">
@@ -32,9 +28,6 @@ export function DashboardLayout() {
             <strong>E‑Commerce Admin</strong>
             <span className="muted">Interview-ready demo</span>
           </div>
-          <button className="btn" onClick={() => setIsPlaygroundOpen(true)}>
-            JS
-          </button>
         </div>
 
         <nav className="nav">
@@ -94,31 +87,22 @@ export function DashboardLayout() {
               <span>Focus</span>
               <strong>Rendering + State</strong>
             </span>
+            {session?.user?.name ? (
+              <span className="pill">
+                <span className="muted">User</span>
+                <strong>{session.user.name}</strong>
+              </span>
+            ) : null}
           </div>
           <div className="topbarRight">
             <button className="btn" onClick={toggleTheme}>
               Theme
-            </button>
-            <button
-              className="btn btnPrimary"
-              onClick={() => setIsPlaygroundOpen(true)}
-            >
-              JS Playground
             </button>
           </div>
         </header>
 
         <Outlet />
       </main>
-
-      {isPlaygroundOpen && (
-        <Modal
-          title="JS Playground (interview topics)"
-          onClose={() => setIsPlaygroundOpen(false)}
-        >
-          <JSPlayground />
-        </Modal>
-      )}
     </div>
   )
 }
