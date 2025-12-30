@@ -1,7 +1,5 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useMemo, useState } from 'react'
-import { Modal } from '../ui/Modal.jsx'
-import { JSPlayground } from '../ui/JSPlayground.jsx'
 import { useTheme } from '../contexts/ThemeContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
@@ -19,7 +17,6 @@ function usePageTitle() {
 
 export function DashboardLayout() {
   const title = usePageTitle()
-  const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false)
   const { toggleTheme } = useTheme()
   const { session } = useAuth()
 
@@ -31,9 +28,6 @@ export function DashboardLayout() {
             <strong>E‑Commerce Admin</strong>
             <span className="muted">Interview-ready demo</span>
           </div>
-          <button className="btn" onClick={() => setIsPlaygroundOpen(true)}>
-            JS
-          </button>
         </div>
 
         <nav className="nav">
@@ -104,26 +98,11 @@ export function DashboardLayout() {
             <button className="btn" onClick={toggleTheme}>
               Theme
             </button>
-            <button
-              className="btn btnPrimary"
-              onClick={() => setIsPlaygroundOpen(true)}
-            >
-              JS Playground
-            </button>
           </div>
         </header>
 
         <Outlet />
       </main>
-
-      {isPlaygroundOpen && (
-        <Modal
-          title="JS Playground (interview topics)"
-          onClose={() => setIsPlaygroundOpen(false)}
-        >
-          <JSPlayground />
-        </Modal>
-      )}
     </div>
   )
 }
